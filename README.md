@@ -3,3 +3,5 @@
 -   AI SDK：https://sdk.vercel.ai/providers/ai-sdk-providers/deepseek
 -   Chatbot：https://sdk.vercel.ai/docs/ai-sdk-ui/chatbot#chatbot
 -   阿里云百炼：https://bailian.console.aliyun.com/
+-   Supabase：https://supabase.com/
+    drizzle：https://orm.drizzle.team/
