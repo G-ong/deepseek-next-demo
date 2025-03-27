@@ -4,4 +4,5 @@
 -   Chatbot：https://sdk.vercel.ai/docs/ai-sdk-ui/chatbot#chatbot
 -   阿里云百炼：https://bailian.console.aliyun.com/
 -   Supabase：https://supabase.com/
-    drizzle：https://orm.drizzle.team/
+-   drizzle：https://orm.drizzle.team/
+-   TanStack/react-query：https://tanstack.com/query/latest/docs/framework/react/installation

@@ -2,16 +2,51 @@
 
 import { useState } from "react";
 import EastIcon from "@mui/icons-material/East";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 
 export default function Home() {
     const [input, setInput] = useState<string>("");
     const [model, setModel] = useState<string>("deepseek-v3");
+    const queryClient = useQueryClient();
+    const router = useRouter();
+    const { user } = useUser();
 
     /**
      * @description 切换模型
      */
     const handleChangeModel = () => {
         setModel(model === "deepseek-v3" ? "deepseek-r1" : "deepseek-v3");
+    };
+
+    // Mutations
+    const { mutate: createChat } = useMutation({
+        mutationFn: async () => {
+            return await axios.post("/api/create-chat", {
+                title: input,
+                model: model,
+            });
+        },
+        onSuccess: (res) => {
+            router.push(`/chat/${res.data.id}`);
+            queryClient.invalidateQueries({ queryKey: ["chats"] });
+        },
+    });
+
+    /**
+     * @description 创建新对话
+     */
+    const handleSubmit = () => {
+        if (!user) {
+            router.push("/sign-in");
+            return;
+        }
+        if (input.trim() === "") {
+            return;
+        }
+        createChat();
     };
 
     return (
@@ -37,7 +72,10 @@ export default function Home() {
                         >
                             <p className="text-sm">深度思考(R1)</p>
                         </div>
-                        <div className="flex items-center justify-center border-2 mr-4 border-black p-1 rounded-full">
+                        <div
+                            className="flex items-center justify-center border-2 mr-4 border-black p-1 rounded-full"
+                            onClick={handleSubmit}
+                        >
                             <EastIcon />
                         </div>
                     </div>
