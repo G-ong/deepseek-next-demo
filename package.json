@@ -9,11 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ai-sdk/deepseek": "^0.2.2",
     "@clerk/nextjs": "^6.12.10",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.8",
     "@mui/material": "^6.4.8",
+    "ai": "^4.2.6",
     "next": "15.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
