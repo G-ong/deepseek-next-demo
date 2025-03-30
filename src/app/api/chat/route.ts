@@ -22,14 +22,14 @@ export async function POST(req: Request) {
 
     // 存储用户消息
     const lastMessage = messages[messages.length - 1];
-    await createMessage(chat_id, lastMessage.content, lastMessage.role);
+    await createMessage(chat_id, lastMessage.role, lastMessage.content);
 
     const result = streamText({
         model: deepseek("deepseek-v3"),
         system: "You are a helpful assistant.",
         messages,
         onFinish: async (result) => {
-            await createMessage(chat_id, result.text, "assistant");
+            await createMessage(chat_id, "assistant", result.text);
         },
     });
 

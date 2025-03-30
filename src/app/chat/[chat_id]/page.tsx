@@ -21,12 +21,26 @@ export default function Page() {
         },
     });
 
+    const { data: previousMessages } = useQuery({
+        queryKey: ["messages", chat_id],
+        queryFn: () => {
+            return axios.get("/api/get-messages", {
+                params: {
+                    chat_id: chat_id as string,
+                    chat_user_id: chat?.data?.userId,
+                },
+            });
+        },
+        enabled: !!chat?.data?.id,
+    });
+
     const { messages, input, handleInputChange, handleSubmit } = useChat({
         body: {
             chat_id: chat_id as string,
             model: model,
             chat_user_id: chat?.data?.userId,
         },
+        initialMessages: previousMessages?.data, // 初始消息
     });
 
     useEffect(() => {
