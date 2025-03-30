@@ -10,6 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 export default function Page() {
     const [model, setModel] = useState<string>("deepseek-v3");
     const endRef = useRef<HTMLDivElement>(null);
+    const [isLoading, setIsLoading] = useState(false);
     const { chat_id } = useParams();
 
     // useQuery 会在组件首次渲染时自动调用queryFn
@@ -46,7 +47,10 @@ export default function Page() {
                 model: model,
                 chat_user_id: chat?.data?.userId,
             },
-            initialMessages: previousMessages?.data, // 初始消息
+            initialMessages: previousMessages?.data,
+            onFinish: () => {
+                setIsLoading(false);
+            },
         });
 
     const handelFirstMessage = useCallback(async () => {
@@ -77,6 +81,12 @@ export default function Page() {
      */
     const handleChangeModel = () => {
         setModel(model === "deepseek-v3" ? "deepseek-r1" : "deepseek-v3");
+    };
+
+    const handleSendMessage = async () => {
+        if (isLoading || !input.trim()) return;
+        setIsLoading(true);
+        await handleSubmit();
     };
 
     return (
@@ -115,20 +125,25 @@ export default function Page() {
                     value={input}
                     onChange={handleInputChange}
                     onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
+                        if (
+                            e.key === "Enter" &&
+                            !e.shiftKey &&
+                            !e.nativeEvent.isComposing
+                        ) {
                             e.preventDefault();
-                            handleSubmit();
+                            handleSendMessage();
                         }
                     }}
+                    disabled={isLoading}
                 ></textarea>
                 <div className="flex items-center justify-between w-full h-12 mb-2">
                     <div
-                        className={`flex  items-center justify-center   rounded-lg border-[1px] px-2 py-1 ml-2 cursor-pointer ${
+                        className={`flex items-center justify-center rounded-lg border-[1px] px-2 py-1 ml-2 cursor-pointer ${
                             model === "deepseek-r1"
                                 ? "border-blue-200 bg-blue-100"
                                 : "border-gray-300"
-                        }`}
-                        onClick={handleChangeModel}
+                        } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+                        onClick={isLoading ? undefined : handleChangeModel}
                     >
                         <p className="text-sm">
                             {model === "deepseek-r1"
@@ -137,8 +152,12 @@ export default function Page() {
                         </p>
                     </div>
                     <div
-                        className="flex items-center justify-center border-2 mr-4 border-black p-1 rounded-full"
-                        onClick={handleSubmit}
+                        className={`flex items-center justify-center border-2 mr-4 border-black p-1 rounded-full ${
+                            isLoading
+                                ? "opacity-50 cursor-not-allowed"
+                                : "cursor-pointer"
+                        }`}
+                        onClick={isLoading ? undefined : handleSendMessage}
                     >
                         <EastIcon />
                     </div>

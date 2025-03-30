@@ -61,7 +61,11 @@ export default function Home() {
                         className="w-full rounded-lg p-3 h-30 focus:outline-none resize-none"
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={(e) => {
-                            if (e.key === "Enter" && !e.shiftKey) {
+                            if (
+                                e.key === "Enter" &&
+                                !e.shiftKey &&
+                                !e.nativeEvent.isComposing
+                            ) {
                                 e.preventDefault();
                                 handleSubmit();
                             }
