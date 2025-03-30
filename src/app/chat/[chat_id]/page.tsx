@@ -1,7 +1,7 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import EastIcon from "@mui/icons-material/East";
 import { useParams } from "next/navigation";
 import axios from "axios";
@@ -34,14 +34,30 @@ export default function Page() {
         enabled: !!chat?.data?.id,
     });
 
-    const { messages, input, handleInputChange, handleSubmit } = useChat({
-        body: {
-            chat_id: chat_id as string,
-            model: model,
-            chat_user_id: chat?.data?.userId,
-        },
-        initialMessages: previousMessages?.data, // 初始消息
-    });
+    const { messages, input, handleInputChange, handleSubmit, append } =
+        useChat({
+            body: {
+                chat_id: chat_id as string,
+                model: model,
+                chat_user_id: chat?.data?.userId,
+            },
+            initialMessages: previousMessages?.data, // 初始消息
+        });
+
+    const handelFirstMessage = useCallback(async () => {
+        console.log(chat?.data?.title, previousMessages?.data?.length);
+        if (chat?.data?.title && previousMessages?.data?.length === 0) {
+            await append({
+                role: "user",
+                content: chat?.data?.title,
+            });
+        }
+    }, [chat?.data?.title, previousMessages?.data?.length, append]);
+
+    useEffect(() => {
+        setModel(chat?.data?.model);
+        handelFirstMessage();
+    }, [handelFirstMessage, chat?.data?.model]);
 
     useEffect(() => {
         if (endRef.current) {
