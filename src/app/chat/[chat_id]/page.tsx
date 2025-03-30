@@ -12,6 +12,7 @@ export default function Page() {
     const endRef = useRef<HTMLDivElement>(null);
     const { chat_id } = useParams();
 
+    // useQuery 会在组件首次渲染时自动调用queryFn
     const { data: chat } = useQuery({
         queryKey: ["chat", chat_id],
         queryFn: () => {
@@ -31,7 +32,11 @@ export default function Page() {
                 },
             });
         },
-        enabled: !!chat?.data?.id,
+        enabled: !!chat?.data?.id, // 只有当 id 数据有值时才会触发请求
+        // 确保创建新会话后快速切换，不会多次创建chat
+        staleTime: 0, // 数据立即过期
+        gcTime: 0, //禁用缓存
+        refetchOnMount: true, //确保组件挂载时重新获取数据
     });
 
     const { messages, input, handleInputChange, handleSubmit, append } =
@@ -55,9 +60,11 @@ export default function Page() {
     }, [chat?.data?.title, previousMessages?.data?.length, append]);
 
     useEffect(() => {
-        setModel(chat?.data?.model);
-        handelFirstMessage();
-    }, [handelFirstMessage, chat?.data?.model]);
+        if (previousMessages?.data !== undefined) {
+            setModel(chat?.data?.model);
+            handelFirstMessage();
+        }
+    }, [handelFirstMessage, chat, previousMessages?.data]);
 
     useEffect(() => {
         if (endRef.current) {
@@ -98,26 +105,36 @@ export default function Page() {
                         </div>
                     ))}
                 </div>
-                {/* 下滑 */}
+                {/* 进入页面时自动下滑 */}
                 <div className="h-4" ref={endRef}></div>
             </div>
             {/* 输入框 */}
             <div className="flex flex-col items-center justify-center mt-4 shadow-lg border-[1px] border-gray-300 h-32 rounded-lg w-2/3">
                 <textarea
-                    className="w-full rounded-lg p-3 h-30 focus:outline-none"
+                    className="w-full rounded-lg p-3 h-30 focus:outline-none resize-none"
                     value={input}
                     onChange={handleInputChange}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSubmit();
+                        }
+                    }}
                 ></textarea>
                 <div className="flex items-center justify-between w-full h-12 mb-2">
                     <div
                         className={`flex  items-center justify-center   rounded-lg border-[1px] px-2 py-1 ml-2 cursor-pointer ${
                             model === "deepseek-r1"
-                                ? "border-blue-300 bg-blue-200"
+                                ? "border-blue-200 bg-blue-100"
                                 : "border-gray-300"
                         }`}
                         onClick={handleChangeModel}
                     >
-                        <p className="text-sm">深度思考(R1)</p>
+                        <p className="text-sm">
+                            {model === "deepseek-r1"
+                                ? "Deepseek(R1)"
+                                : "Deepseek(V3)"}
+                        </p>
                     </div>
                     <div
                         className="flex items-center justify-center border-2 mr-4 border-black p-1 rounded-full"

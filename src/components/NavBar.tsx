@@ -33,7 +33,7 @@ const NavBar = () => {
                     router.push("/");
                 }}
             >
-                <p className="h-full w-2/3 flex items-center justify-center bg-blue-100 rounded-lg">
+                <p className="h-full w-full flex items-center justify-center bg-blue-100 rounded-lg">
                     创建新会话
                 </p>
             </div>
@@ -47,10 +47,10 @@ const NavBar = () => {
                         }}
                     >
                         <p
-                            className={`font-extralight text-sm line-clamp-1 ${
+                            className={`text-sm line-clamp-1 ${
                                 pathname === `/chat/${chat.id}`
-                                    ? "font-bold text-blue-500"
-                                    : ""
+                                    ? "font-extrabold text-blue-500"
+                                    : "font-normal"
                             }`}
                         >
                             {chat?.title}

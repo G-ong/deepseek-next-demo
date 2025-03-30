@@ -99,7 +99,8 @@ export const getMessagesByChatId = async (chatId: number) => {
         const messages = await db
             .select()
             .from(messagesTable)
-            .where(eq(messagesTable.chatId, chatId));
+            .where(eq(messagesTable.chatId, chatId))
+            .orderBy(messagesTable.id); // 确保消息按 id 排序，不会乱序
         return messages;
     } catch (error) {
         console.error("Failed to get messages", error);
