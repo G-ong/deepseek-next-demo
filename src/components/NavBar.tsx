@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useUser } from "@clerk/nextjs";
+import { useUser, SignOutButton } from "@clerk/nextjs";
 import { useRouter, usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { ChatModel } from "@/db/schema";
@@ -22,10 +22,20 @@ const NavBar = () => {
         enabled: !!user,
     });
 
+    // 如果用户未登录，不显示导航栏
+    if (!user) {
+        return null;
+    }
+
     return (
-        <div className="h-screen bg-gray-50 p-3">
-            <div className="flex items-center justify-center">
+        <div className="w-1/5 h-screen bg-gray-50 overflow-y-auto p-3">
+            <div className="flex items-center justify-between">
                 <p className="font-bold text-2xl">Deepseek</p>
+                <SignOutButton>
+                    <button className="text-sm text-gray-600 hover:text-gray-900">
+                        退出登录
+                    </button>
+                </SignOutButton>
             </div>
             <div
                 className="h-10 flex items-center justify-center mt-4 cursor-pointer"

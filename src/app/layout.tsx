@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
 import NavBar from "@/components/NavBar";
-import QueryClientProvider from "@/components/QueryClientProvider";
+import Providers from "@/components/Providers";
 
 const geistSans = Geist({
-    variable: "--font-geist-sans",
     subsets: ["latin"],
+    variable: "--font-geist-sans",
 });
 
 const geistMono = Geist_Mono({
-    variable: "--font-geist-mono",
     subsets: ["latin"],
+    variable: "--font-geist-mono",
 });
 
 export const metadata: Metadata = {
@@ -26,19 +26,15 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <ClerkProvider>
-            <QueryClientProvider>
-                <html lang="en">
-                    <body
-                        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-row`}
-                    >
-                        <div className="w-1/5 h-screen bg-gray-50 overflow-y-auto">
-                            <NavBar />
-                        </div>
-                        <div className="w-4/5 h-screen">{children}</div>
-                    </body>
-                </html>
-            </QueryClientProvider>
-        </ClerkProvider>
+        <html lang="en">
+            <body
+                className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-row`}
+            >
+                <Providers>
+                    <NavBar />
+                    <div className="flex-1 h-screen">{children}</div>
+                </Providers>
+            </body>
+        </html>
     );
 }

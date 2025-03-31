@@ -1,7 +1,7 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import EastIcon from "@mui/icons-material/East";
 import { useParams } from "next/navigation";
 import axios from "axios";
@@ -11,6 +11,7 @@ export default function Page() {
     const [model, setModel] = useState<string>("deepseek-v3");
     const endRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const initializedRef = useRef(false);
     const { chat_id } = useParams();
 
     // useQuery 会在组件首次渲染时自动调用queryFn
@@ -53,22 +54,19 @@ export default function Page() {
             },
         });
 
-    const handelFirstMessage = useCallback(async () => {
-        console.log(chat?.data?.title, previousMessages?.data?.length);
-        if (chat?.data?.title && previousMessages?.data?.length === 0) {
-            await append({
-                role: "user",
-                content: chat?.data?.title,
-            });
-        }
-    }, [chat?.data?.title, previousMessages?.data?.length, append]);
-
     useEffect(() => {
-        if (previousMessages?.data !== undefined) {
+        if (previousMessages?.data !== undefined && !initializedRef.current) {
             setModel(chat?.data?.model);
-            handelFirstMessage();
+            if (chat?.data?.title && previousMessages?.data?.length === 0) {
+                setIsLoading(true);
+                append({
+                    role: "user",
+                    content: chat?.data?.title,
+                });
+            }
+            initializedRef.current = true;
         }
-    }, [handelFirstMessage, chat, previousMessages?.data]);
+    }, [previousMessages?.data, chat?.data?.model, chat?.data?.title, append]);
 
     useEffect(() => {
         if (endRef.current) {
